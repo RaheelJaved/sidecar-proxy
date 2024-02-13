@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: frontservice-dotnet
+  name: frontservice-dotnet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontservice-dotnet
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: frontservice-dotnet
+    spec:
+      containers:
+      - image: docker.io/raheeljaved/frontservice-dotnet
+        name: frontservice-dotnet
+        ports:
+        - containerPort: 5001
+        resources: {}
+status: {}

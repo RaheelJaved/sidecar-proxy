@@ -1,0 +1,1 @@
+while pod is creating, it fails with image pull error, showing this error detail "tls: failed to verify certificate: x509: certificate signed by unknown authority"
