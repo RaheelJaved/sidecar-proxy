@@ -1,0 +1,10 @@
+1) export all FZ certificates from browser
+
+2) copy them to ubuntu at this location "/usr/local/share/ca-certificates"
+
+3) install "ca-certificate" package if not already installed
+$ sudo apt-get update && apt-get install -y ca-certificates
+
+4) update the certificates
+$ sudo update-ca-certificates
+

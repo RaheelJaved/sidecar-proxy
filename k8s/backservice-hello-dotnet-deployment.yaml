@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: backservice-hello-dotnet
+  name: backservice-hello-dotnet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backservice-hello-dotnet
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: backservice-hello-dotnet
+    spec:
+      containers:   
+      - name: backservice-hello-dotnet
+        image: docker.io/raheeljaved/backservice-hello-dotnet
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6001
+        env:
+        - name: FailureRate
+          value: "100"
+        - name: ASPNETCORE_URLS
+          value: http://+:6001
+status: {}

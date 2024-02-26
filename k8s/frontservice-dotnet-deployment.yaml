@@ -18,9 +18,60 @@ spec:
         app: frontservice-dotnet
     spec:
       containers:
-      - image: docker.io/raheeljaved/frontservice-dotnet
-        name: frontservice-dotnet
+      - name: frontservice-dotnet
+        image: docker.io/raheeljaved/frontservice-dotnet
+        imagePullPolicy: Always
         ports:
         - containerPort: 5001
         resources: {}
+        env:
+        - name: Logging__LogLevel__Default
+          value: Information
+        - name: Logging__LogLevel__Microsoft.AspNetCore
+          value: Information
+        - name: HelloService__BaseUrl
+          #value: http://localhost:9001
+          value: http://backservice-hello-dotnet.default.svc.cluster.local:6001/
+        - name: Proxy__Enabled
+          value: "true"
+        - name: Proxy__Address
+          value: http://localhost:9001  
+      # - name: bb
+      #   image: busybox:latest
+      #   command: ["sleep", "60000"]
+      #   tty: true
+      #   volumeMounts:
+      #   - name: envoy-config
+      #     mountPath: /etc/envoy
+      #     #subPath: envoy.yaml
+      - name: envoy
+        image: envoyproxy/envoy:v1.29-latest
+        ports:
+        - containerPort: 9901
+        - containerPort: 10000
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "Running as $(whoami)"
+          echo "Listing contents of /etc/envoy:"
+          ls -l /etc/envoy
+          echo "Contents of /etc/envoy/envoy.yaml:"
+          cat /etc/envoy/envoy.yaml
+          echo "Starting Envoy..."
+          exec /usr/local/bin/envoy --config-path /etc/envoy/envoy.yaml --mode serve
+        volumeMounts:
+        - name: envoy-config
+          mountPath: /etc/envoy
+          #subPath: envoy.yaml
+      volumes:
+      - name: envoy-config
+        configMap:
+          name: frontservice-dotnet-envoy-config 
+          #defaultMode: 0777
+
 status: {}
+
+# config map creation
+# --> kubectl create configmap frontservice-dotnet-envoy-config --from-file=envoy.yaml --dry-run=client -o yaml | kubectl apply -f -
+# --> kubectl create configmap frontservice-dotnet-envoy-config --from-file=envoy.json --dry-run=client -o yaml | kubectl apply -f -
+

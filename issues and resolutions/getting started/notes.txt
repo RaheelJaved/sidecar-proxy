@@ -1,0 +1,168 @@
+non-bloating setup with docker and minikube without docker desktop
+------------------------------------------------------------------
+
+1) enable WSL feature in windows. Run this in poweshell
+   Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+
+2) Download linix distribution - Ubuntu LTS
+
+   from this site --> https://learn.microsoft.com/en-us/windows/wsl/install-manual#downloading-distributions
+   or from powershell --> Invoke-WebRequest -Uri https://aka.ms/wslubuntu2004 -OutFile Ubuntu.appx -UseBasicParsing
+  
+3) Install ubuntu and create user - Do it as regular user (not elevated)
+
+   double click on the downloaded .appx file
+   or from powershell --> Add-AppxPackage [downloaded .appx path]
+
+
+4) Set linux root password for later use
+   
+   a) From powershell start ubuntu as root
+      wsl -u root -d ubuntu
+
+   b) on linux shell, run following
+
+      $ passwd
+      then enter password
+
+      $ exit
+
+Setting up docker in ubuntu
+---------------------------
+
+1) to install docker, follow these steps
+    https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+
+2) just after installation docker will not be ready to pull images because of FZ's custom signed certificates
+
+    a) export all FZ certificates from a browser (open docker.io)
+
+    b) copy them to ubuntu at this location in ubuntu "/usr/local/share/ca-certificates"
+        to access windows folder go to "/mnt/the-path-where-you-saved-certificates"
+    c) install "ca-certificate" package if not already installed
+         $ sudo apt-get update && apt-get install -y ca-certificates
+
+    d) update the certificates
+        $ sudo update-ca-certificates
+
+3) restart docker service
+   $ sudo service docker restart
+
+4) try running hello-world
+   $ sudo docker run hello-world
+
+5) setup docker to start automatically on boot
+   edit the file "/etc/wsl.conf" and add the following contents
+
+  [boot]
+  command= service docker start
+
+6) then restart wsl
+
+   a) from windows commandline or poweshell:
+      "wsl --shutdown"
+      "wsl" or "wsl -d ubuntu"
+
+   b) inside wsl ubuntu check if docker is running
+      $ sudo service docker status
+
+
+Add FZ CA in WSL
+----------------
+This is required for docker running in WSL to be able to pull images on FZ network
+1) Export all FZ certificates from browser
+
+2) Copy them to ubuntu at this location "/usr/local/share/ca-certificates"
+
+3) Install "ca-certificate" package if not already installed
+   $ sudo apt-get update && apt-get install -y ca-certificates
+
+4) Update the CA certificates
+   $ sudo update-ca-certificates
+
+
+
+To run docker without sudo
+--------------------------
+in ubuntu... do the following
+
+1) add docker user and dockerd to sudo-ers
+   $ sudo visudo
+
+2) add this line just before including sudoers file, last line (replace your-user-name with logged in non-root user)
+   # Docker daemon specification 
+   your-user-name ALL=(ALL) NOPASSWD: /usr/bin/dockerd
+
+3) add your user to docker group ($USER) will pick up currently logged in user
+  $ sudo usermod -aG docker $USER
+
+4) now try running docker without sudo
+   $ docker run hello-world
+
+
+Make WSL instance of docker accessible in Windows Powershell
+------------------------------------------------------------
+follow these steps
+https://medium.com/@longeardev/streamlined-docker-workflow-running-docker-cli-on-windows-without-the-bloat-of-docker-desktop-5b55f6ca88a4
+
+1) install docker cli on windows (if not already installed)
+   choco install docker-cli  (or use any other method)
+
+2) make docker daemon accept TCP connections
+   a) edit "/etc/docker/daemon.json" add following
+      {
+        "hosts": ["unix:///var/run/docker.sock", "tcp://127.0.0.1:2375"]
+      }
+   b) restart docker service
+      $ sudo service docker restart
+
+3) in windows (powershell or cmd) point DOCKER_HOST environment variable to tcp://127.0.0.1:2375
+   powershell --> $env:DOCKER_HOST = "tcp://127.0.0.1:2375"
+   cmd -> set DOCKER_HOST=tcp://127.0.0.1:2375
+
+4) run docker commands to test (this should return running docker containers inside WSL docker instance)
+   docker ps -a
+
+5) this may conflict with docker desktop service running in windows, to use it better remove docker desktop
+
+
+Install Kubectl
+---------------
+https://kubernetes.io/docs/tasks/tools/#kubectl
+
+
+Install Minikube
+----------------
+https://kubernetes.io/docs/tasks/tools/#minikube
+
+
+Install CA Certs in minikube VM
+-------------------------------
+ref: https://minikube.sigs.k8s.io/docs/handbook/untrusted_certs/#untrusted-root-certificates
+
+"minikube start" command spins up a VM. When docker is used as driver (instead of hyperv or vitual-box), the VM is emulated via a container running in docker
+Inside this VM. minikube runs the kubernetes cluster.
+
+Note: 
+to explicitely use docker driver
+minikube start --driver=docker
+
+to make docker the default driver
+minikube config set driver docker
+
+Now, we need to add FZ root certificate in the minikube VM. Minikube has a way to automatically do that. Take the following steps:
+
+1) Define MINIKUBE_HOME environment variable.
+   Create a folder, for example "C:\MINIKUBE_HOME" and set the environment variable MINIKUBE_HOME=C:\MINIKUBE_HOME
+   If MINIKUBE_HOME environment variable is not defined, the folder from where we do "minikube start" will be considered minikube home.
+
+2) Inside the MINIKUBE_HOME create new folder ".minikube/certs"
+
+3) Copy the certificate file in ".minikube/certs" folder
+
+4) Delete minikube cluster if its already running
+   $ minikube delete
+
+5) Start new cluster with the certificate 
+   $ minikube start --embed-certs
+

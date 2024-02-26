@@ -1,0 +1,5 @@
+docker run -d --rm --name envoy -p 9901:9901 envoyproxy/envoy:v1.29-latest
+
+
+kubectl create configmap frontservice-dotnet-envoy-config --from-file=envoy.json --dry-run=client -o yaml | kubectl apply -f -
+

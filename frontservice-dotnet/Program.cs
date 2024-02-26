@@ -5,17 +5,22 @@ namespace frontservice_dotnet
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddTransient<MyHttpHandler>();
+
+            var baseUrl = builder.Configuration["HelloService:BaseUrl"];
+            builder.Services.AddHttpClient("HelloServiceClient", client =>
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }).AddHttpMessageHandler<MyHttpHandler>();
+
+            builder.Services.AddControllers();
+
             var app = builder.Build();
 
-            app.MapGet("/hello", Hello);
+            app.MapControllers();
 
             app.Run();
-        }
-
-        static async Task Hello(HttpContext ctx)
-        {
-            var message = @$"DOTNET frontservice: {DateTime.Now.ToLongTimeString()} says --> ";
-            await ctx.Response.WriteAsync(message);
         }
     }
 }

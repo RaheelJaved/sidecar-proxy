@@ -10,7 +10,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copy NuGet's root certificate
-COPY ["certs/1-FZ-Secure-Root-CA.crt", "/usr/local/share/ca-certificates/nuget-root.crt"]
+COPY ["certs/fz-root-ca.crt", "/usr/local/share/ca-certificates/fz-root-ca.crt"]
 
 # Install and update CA certificates
 RUN apt-get update && \
@@ -31,4 +31,6 @@ RUN dotnet publish "./backservice-hello-dotnet.csproj" -c $BUILD_CONFIGURATION -
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+ENV ASPNETCORE_HTTP_PORTS=6001
 ENTRYPOINT ["dotnet", "backservice-hello-dotnet.dll"]

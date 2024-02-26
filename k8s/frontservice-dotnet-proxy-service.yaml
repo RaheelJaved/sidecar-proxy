@@ -4,15 +4,15 @@ metadata:
   creationTimestamp: null
   labels:
     app: frontservice-dotnet
-  name: frontservice-dotnet
+  name: frontservice-dotnet-proxy
 spec:
   ports:
-  - name: frontservice-hello
-    port: 5001
+  - name: frontservice-proxy
+    port: 9901
     protocol: TCP
-    targetPort: 5001
+    targetPort: 9901
   selector:
     app: frontservice-dotnet
-  type: LoadBalancer
+  type: ClusterIP
 status:
   loadBalancer: {}
