@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: backservice-bye-nodejs
+  name: backservice-bye-nodejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backservice-bye-nodejs
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: backservice-bye-nodejs
+    spec:
+      containers:   
+      - name: backservice-bye-nodejs
+        image: docker.io/raheeljaved/backservice-bye-nodejs
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6002
+        env:
+        - name: FAILURERATE
+          value: "100"
+status: {}

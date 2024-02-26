@@ -1,0 +1,10 @@
+{
+  "name": "backservice-hello-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.17.3",
+    "pino": "^8.19.0"
+  }
+}

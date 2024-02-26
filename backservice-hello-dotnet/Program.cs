@@ -49,6 +49,8 @@ namespace backservice_hello_dotnet
             StringBuilder headersBuilder = new StringBuilder();
             foreach (var header in ctx.Request.Headers)
             {
+                if (header.Key.StartsWith("x-fwd")) continue; //ignore the custom headers added for proxy by the frontservice
+
                 headersBuilder.AppendLine($"{header.Key}: {header.Value}");
             }
 

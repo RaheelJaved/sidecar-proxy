@@ -50,10 +50,9 @@ static_resources:
                 route:
                   cluster: dynamic_forward_proxy_cluster
                   host_rewrite_header: X-Fwd-HostWithPort
-                  # retry_policy:
-                  #   retry_on: 5xx
-                  #   num_retries: 3
-                  #   per_try_timeout: 2s
+                  retry_policy:
+                    retry_on: 5xx
+                    num_retries: 1
               include_request_attempt_count: true
           http_filters:
           - name: envoy.filters.http.dynamic_forward_proxy
@@ -65,6 +64,9 @@ static_resources:
           - name: envoy.filters.http.router
             typed_config:
               "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+              # retry_policy:
+              #   retry_on: 5xx
+              #   num_retries: 0
   clusters:
   - name: dynamic_forward_proxy_cluster
     #connect_timeout: 10s

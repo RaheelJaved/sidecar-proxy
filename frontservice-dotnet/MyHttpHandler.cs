@@ -94,6 +94,7 @@ namespace frontservice_dotnet
 
 
         }
+
     }
 
     public class ProxySetting

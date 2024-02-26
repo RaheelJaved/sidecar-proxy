@@ -32,6 +32,9 @@ spec:
         - name: HelloService__BaseUrl
           #value: http://localhost:9001
           value: http://backservice-hello-dotnet.default.svc.cluster.local:6001/
+        - name: ByeService__BaseUrl
+          #value: http://localhost:9001
+          value: http://backservice-bye-nodejs.default.svc.cluster.local:6002/
         - name: Proxy__Enabled
           value: "true"
         - name: Proxy__Address
