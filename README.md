@@ -22,7 +22,7 @@ kubectl apply -f .\frontservice-dotnet-service
 ```
 
 5)	Get url to invoke service
-kubectl get svc
+`kubectl get svc`
 
 6) Take note of the exposed `frontservice-dotnet`  and open in browser, navigate to *hello* or *bye* to invoke respective backend services via the frontend. These requests will go through the envoy proxy running inside pods of frontservice-dotnet app.
    for example: `http://localhost:5001/hello" or `http://localhost:5001/hello`
