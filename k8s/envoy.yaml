@@ -40,7 +40,7 @@ static_resources:
                   host_rewrite_header: X-Fwd-HostWithPort
                   retry_policy:
                     retry_on: 5xx
-                    num_retries: 1
+                    num_retries: 3
                     #per_try_timeout: 5s
                     # retry_back_off:
                     #   base_interval: 1s
@@ -52,7 +52,7 @@ static_resources:
                   host_rewrite_header: X-Fwd-HostWithPort
                   retry_policy:
                     retry_on: 5xx
-                    num_retries: 1
+                    num_retries: 3
               include_request_attempt_count: true
           http_filters:
           - name: envoy.filters.http.dynamic_forward_proxy
